@@ -10,10 +10,17 @@ todos = []
 class TodoIn(BaseModel):
     title: str
     done: bool = False
+class TodoItem(BaseModel):
+    id: int
+    title: str
+    done: bool
+class TodoListOut(BaseModel):
+    data: list[TodoItem]
+    message: str
 
-@app.get("/todos")
+@app.get("/todos",response_model=TodoListOut)
 def list_todos():
-    return todos
+    return {"data":todos, "message":"success"}
 
 @app.post("/todos", status_code=201)
 def create_todo(body: TodoIn):
