@@ -1,0 +1,23 @@
+[project]
+name = "sample-app"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Nur Hanna", email = "nurhanna01@users.noreply.github.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "fastapi[standard]>=0.162.0",
+    "inceptionai>=0.3.0",
+    "langchain>=1.4.7",
+    "langchain-google-genai>=4.4.2",
+    "langchain-openai>=1.7.3",
+]
+
+[project.scripts]
+sample-app = "sample_app:main"
+
+[build-system]
+requires = ["uv_build>=0.13.6,<0.14.0"]
+build-backend = "uv_build"
