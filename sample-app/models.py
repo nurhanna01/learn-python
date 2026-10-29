@@ -6,10 +6,11 @@ class TestCase(BaseModel):
     steps: list[str] = Field(min_length=1, description="Langkah berurutan")
     expected_result: str
     priority: Literal["low", "medium", "high"] = "medium"
+    type: Literal["positive", "negative"]
 
 class TestCaseList(BaseModel):
     test_cases: list[TestCase]
 
 class GenerateRequest(BaseModel):
-    feature_description: str = Field(description="Deskripsi fitur yang akan dites")
-    project_id : str = Field(description="Project id")
+    feature_description: str = Field(min_length=3,description="Deskripsi fitur yang akan dites")
+    project_id : Literal["111","222"] = Field(description="Project id")

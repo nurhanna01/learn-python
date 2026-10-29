@@ -1672,6 +1672,7 @@ dependencies = [
     { name = "langchain" },
     { name = "langchain-google-genai" },
     { name = "langchain-openai" },
+    { name = "langgraph" },
 ]
 
 [package.metadata]
@@ -1681,6 +1682,7 @@ requires-dist = [
     { name = "langchain", specifier = ">=1.4.7" },
     { name = "langchain-google-genai", specifier = ">=4.4.2" },
     { name = "langchain-openai", specifier = ">=1.7.3" },
+    { name = "langgraph", specifier = ">=1.2.18" },
 ]
 
 [[package]]

@@ -1,12 +1,19 @@
 from fastapi import FastAPI, HTTPException
 from models import GenerateRequest, TestCaseList
-from generator_mercury import generate_test_cases
+from generator_mercury import run_graph
+from logger import logger_setup
+import logging
 
 app = FastAPI()
+
+logger_setup()
+log = logging.getLogger(__name__)
 
 @app.post("/generate-test-cases", response_model=TestCaseList)
 def generate(body: GenerateRequest):
     try:
-        return generate_test_cases(body.project_id, body.feature_description)
+        log.info("Mulai proses endpoint /generate-test-cases")
+        return run_graph(body.project_id, body.feature_description)
     except Exception as e:
-        raise HTTPException(status_code=503, detail="Layanan AI sedang sibuk")
+        log.error(f"error: {e}")
+        raise HTTPException(status_code=500)
