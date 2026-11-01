@@ -4,9 +4,9 @@ import json
 
 log = logging.getLogger(__name__)
 
-def logger_setup():
+def logger_setup() -> None:
     logging.basicConfig(
-        level=logging.DEBUG
+        level=logging.INFO,
     )
 
 class LLMLogger(BaseCallbackHandler):
@@ -15,6 +15,7 @@ class LLMLogger(BaseCallbackHandler):
         log.info(json.dumps({
             "model": msg.response_metadata.get("model_name"),
             "usage": msg.usage_metadata,
+            "finish_reason": msg.response_metadata.get("finish_reason"),
         }, default=str, ensure_ascii=False))
 
     def on_llm_error(self, error, **kwargs):

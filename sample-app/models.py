@@ -13,4 +13,4 @@ class TestCaseList(BaseModel):
 
 class GenerateRequest(BaseModel):
     feature_description: str = Field(min_length=3,description="Deskripsi fitur yang akan dites")
-    project_id : Literal["111","222"] = Field(description="Project id")
+    project_id : Literal["1","2"] = Field(description="Project id")
