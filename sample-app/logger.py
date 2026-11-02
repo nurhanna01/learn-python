@@ -6,7 +6,7 @@ log = logging.getLogger(__name__)
 
 def logger_setup() -> None:
     logging.basicConfig(
-        level=logging.INFO,
+        level=logging.DEBUG,
     )
 
 class LLMLogger(BaseCallbackHandler):

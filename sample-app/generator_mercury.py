@@ -54,20 +54,19 @@ _agent = create_agent(
 
 def generate(state: State) -> dict :
     try:
-        print(f"Mulai Percobaan ke =========================> {state.get("attempts") + 1}")
-        print(f"check isi state:{state}")
         log.debug("============== PEMANGGILAN GENERATE ====================")
+        log.debug(f"Mulai Percobaan ke =========================> {state.get("attempts") + 1}")
         deskripsi = state["feature_description"]
         if state.get("problem"):
             deskripsi += (
                 "\nPerbaiki problem berikut dari percobaan sebelumnya: \n"
                 + "".join(state["problem"])
             )
-        print(f"==PROMPT KE AI] percobaan ke {state.get("attempts") + 1} ==>>>>>>", deskripsi)
+        log.debug(f"==PROMPT KE AI] percobaan ke {state.get("attempts") + 1} ==>>>>>>{deskripsi}")
         
         result = generate_test_cases(state["project_id"],deskripsi)
         attempts = state.get("attempts", 0) + 1
-        log.debug(f"generate percobaan ke {attempts},")
+        log.debug(f"selesai generate percobaan ke {attempts},")
 
         return {"result":result, "attempts":attempts}
     except Exception as e:
@@ -77,7 +76,6 @@ def generate(state: State) -> dict :
 def check(state:State) -> dict:
     log.debug("======= PEMANGGILAN CHECK =========")
     try :
-        # print(f"check:{state}")
         cases = state["result"].test_cases
         problem = []
 
@@ -97,16 +95,16 @@ def check(state:State) -> dict:
         log.error(f"ERROR CHECK==> {e}")
         raise e
 
-def putuskan(state:State) -> dict :
+def decide (state:State) -> dict :
     try:
-        log.debug("======= PEMANGGILAN PUTUSKAN =========")
+        log.debug("======= PEMANGGILAN decide  =========")
         if not state["problem"]:
-            return "selesai"
+            return "complete"
         if state["attempts"] >= MAX_ATTEMPS:
-            return "menyerah"
-        return "ulangi"
+            return "give_up"
+        return "retry"
     except Exception as e:
-        log.error(f"ERROR PUTUSKAN==>{e}")
+        log.error(f"ERROR decide ==>{e}")
         raise e
 
 _writer_agent = create_agent(
@@ -118,7 +116,7 @@ _writer_agent = create_agent(
 )
 
 def store(state: State) -> dict:
-    print("======= PEMANGGILAN STORE =========")
+    log.debug("======= PEMANGGILAN STORE =========")
     try:
         filename = f"{state['project_id']}.md"
         target = OUTPUT_DIR / filename
@@ -128,15 +126,15 @@ def store(state: State) -> dict:
                 "role": "user",
                 "content": (
                     f"filename: {filename}\n"
-                    f"Fitur: {state['feature_description']}\n"
-                    f"Test case:\n{state['result'].model_dump_json()}"
+                    f"fitur: {state['feature_description']}\n"
+                    f"test cases:\n{state['result'].model_dump_json()}"
                 ),
             }]
         })
 
         if not target.exists():
             raise RuntimeError("AI tidak memanggil write_gherkin, file tidak dibuat")
-        print(f"[store] file tersimpan: {target}")
+        log.info(f"File tersimpan di: {target}")
         return {}
     except Exception as e:
         log.error(f"ERROR STORE==> {e}")
@@ -149,7 +147,7 @@ _graph.add_node("store",store),
 _graph.add_edge(START, "generate")
 _graph.add_edge("generate","check")
 _graph.add_conditional_edges(
-    "check", putuskan, {"ulangi": "generate", "menyerah": END, "selesai": "store"}
+    "check", decide , {"retry": "generate", "give_up": END, "complete": "store"}
 )
 _graph.add_edge("store",END)
 _app = _graph.compile()

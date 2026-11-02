@@ -4,12 +4,9 @@ from contextvars import ContextVar
 correlation_id_var: ContextVar[str] = ContextVar("correlation_id", default="-")
 
 
-class CorrelationFilter(logging.Filter):
-    """Menempelkan correlation_id ke setiap baris log."""
-
-    def filter(self, record: logging.LogRecord) -> bool:
-        record.correlation_id = correlation_id_var.get()
-        return True
+def add_correlation_id(record: logging.LogRecord) -> bool:
+    record.correlation_id = correlation_id_var.get()
+    return True
 
 
 def setup_logging_tracer() -> None:
@@ -19,4 +16,4 @@ def setup_logging_tracer() -> None:
     )
     # supaya log dari SEMUA logger ikut kena
     for handler in logging.getLogger().handlers:
-        handler.addFilter(CorrelationFilter())
+        handler.addFilter(add_correlation_id)
